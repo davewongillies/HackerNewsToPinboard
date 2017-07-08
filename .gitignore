@@ -1,0 +1,11 @@
+### VirtualEnv ###
+# Virtualenv
+.env
+.Python
+[Bb]in
+[Ii]nclude
+[Ll]ib
+[Ll]ocal
+[Ss]cripts
+pyvenv.cfg
+pip-selfcheck.json
