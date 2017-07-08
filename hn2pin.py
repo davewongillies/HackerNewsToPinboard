@@ -23,11 +23,11 @@ import xml.etree.ElementTree as xml
 HACKERNEWS = 'https://news.ycombinator.com'
 
 def getSavedStories(session, hnuser):
-    print "...get saved stories..."
+    print "Getting saved stories..."
     savedStories = {}
-    saved = session.get(HACKERNEWS + '/saved?id=' + hnuser)
+    saved = session.get(HACKERNEWS + '/upvoted?id=' + hnuser)
 
-    soup = BeautifulSoup(saved.content)
+    soup = BeautifulSoup(saved.content, "html.parser")
 
     for tag in soup.findAll('td',attrs={'class':'title'}):
 
@@ -69,8 +69,9 @@ def postToPinboard(token, url, title):
         'auth_token':token,
         'url': url,
         'description': title,
-        'tags': 'hackernews',
-        'replace':'no'
+        'tags': 'via:hackernews',
+        'replace':'no',
+        'toread': yes
     }
     r = requests.get('https://api.pinboard.in/v1/posts/add', params=payload)
     #print r.url
