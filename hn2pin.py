@@ -30,7 +30,6 @@ def getSavedStories(session, hnuser):
     soup = BeautifulSoup(saved.content, "html.parser")
 
     for tag in soup.findAll('td',attrs={'class':'title'}):
-
         if type(tag.a) is not NoneType:
             try:
                 _href = tag.a['href']
@@ -71,7 +70,7 @@ def postToPinboard(token, url, title):
         'description': title,
         'tags': 'via:hackernews',
         'replace':'no',
-        'toread': yes
+        'toread': 'yes'
     }
     r = requests.get('https://api.pinboard.in/v1/posts/add', params=payload)
     #print r.url
