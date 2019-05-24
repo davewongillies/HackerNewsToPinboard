@@ -7,10 +7,7 @@ verify_ssl = true
 
 [packages]
 beautifulsoup4 = "*"
-ndg-httpsclient = "*"
-pyasn1 = "*"
 requests = "*"
-pyOpenSSL = "*"
 
 [requires]
 python_version = "3.7"
