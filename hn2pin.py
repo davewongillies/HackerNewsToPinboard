@@ -16,6 +16,7 @@ import sys
 import requests
 from bs4 import BeautifulSoup
 import xml.etree.ElementTree as xml
+from user_agent import generate_user_agent
 
 HACKERNEWS = 'https://news.ycombinator.com'
 
@@ -43,12 +44,11 @@ def getSavedStories(session, hnuser):
 
 def loginToHackerNews(username, password):
     s = requests.Session()  # init a session (use cookies across requests)
+    accept_header = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"  # noqa E501
     # we need to specify an header to get the right cookie
     headers = {
-        'User-Agent':
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:25.0) Gecko/20100101 Firefox/25.0',  # noqa E501
-        'Accept':
-        "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        'User-Agent': generate_user_agent(),
+        'Accept': accept_header,
     }
 
     # Build the login POST data and make the login request.
