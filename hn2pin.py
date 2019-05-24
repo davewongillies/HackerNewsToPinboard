@@ -13,6 +13,7 @@ __copyright__ = "Copyright 2013-2014, Luciano Fiandesio"
 __author__ = "Luciano Fiandesio <http://fiandes.io/>"
 
 import sys
+import logging
 import requests
 from bs4 import BeautifulSoup
 import xml.etree.ElementTree as xml
@@ -20,26 +21,29 @@ from user_agent import generate_user_agent
 
 HACKERNEWS = 'https://news.ycombinator.com'
 
+logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                    level=logging.INFO)
+
 
 def getSavedStories(session, hnuser):
-    print("Getting saved stories...")
-    savedStories = {}
-    saved = session.get(HACKERNEWS + '/upvoted?id=' + hnuser)
+    logging.info("Getting upvoted stories from news.ycombinator.com")
+    upvotedStories = {}
+    upvoted = session.get(HACKERNEWS + '/upvoted?id=' + hnuser)
 
-    soup = BeautifulSoup(saved.content, "html.parser")
+    soup = BeautifulSoup(upvoted.content, "html.parser")
 
     for tag in soup.findAll('td', attrs={'class': 'title'}):
         if not isinstance(tag.a, type(None)):
             try:
                 _href = tag.a['href']
-                if not str.startswith(str(_href),
-                                      '/x?fnid'):  # skip the 'More' link
+                # skip the 'More' link
+                if not str.startswith(str(_href), '/x?fnid'):
                     _href = HACKERNEWS + _href if str.startswith(
                         str(_href), 'item?') else _href
-                    savedStories[_href] = tag.a.text
+                    upvotedStories[_href] = tag.a.text
             except:  # noqa: E722
-                print("The saved story has no link, skipping")
-    return savedStories
+                logging.warning("The saved story has no link, skipping")
+    return upvotedStories
 
 
 def loginToHackerNews(username, password):
@@ -73,12 +77,17 @@ def postToPinboard(token, url, title):
         'toread': 'yes'
     }
     r = requests.get('https://api.pinboard.in/v1/posts/add', params=payload)
+
+    if isAdded(r.text):
+        logging.info("Posting to pinboard.in: {}: {}".format(title, url))
+
     return 1 if isAdded(r.text) else 0
 
 
 def isAdded(addresult):
     res = xml.fromstring(addresult)
     code = res.attrib["code"]
+
     return code == 'done'
 
 
@@ -89,7 +98,7 @@ def main():
     for key, value in links.items():
         count += postToPinboard(sys.argv[3], key, value)
 
-    print("Added {} links to Pinboard".format(count))
+    logging.info("Added {} links to Pinboard".format(count))
 
 
 if __name__ == "__main__":
